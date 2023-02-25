@@ -1,0 +1,5 @@
+rootProject.name = 'project-template'
+include 'api'
+include 'impl'
+include 'impl'
+
