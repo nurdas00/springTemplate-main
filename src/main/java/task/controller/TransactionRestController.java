@@ -4,17 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import task.entity.Transaction;
 import task.entity.User;
-import task.enums.Currency;
-import task.enums.TransactionStatus;
 import task.service.TransactionService;
-
-import java.util.Map;
 
 @Slf4j
 @RestController
@@ -23,21 +18,31 @@ public class TransactionRestController {
 
     private final TransactionService transactionService;
 
-    @PostMapping(path = "/send")
-    public ResponseEntity<String> sendMoney(@RequestBody Transaction transaction) {
-        log.info("i am on back");
+    @PostMapping(path = "/send", consumes = "application/json")
+    public ResponseEntity<?> sendMoney(@RequestBody Transaction transaction) {
+        try {
+            transactionService.createTransasction(transaction);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
-        transactionService.createTransasction(transaction);
-
-        log.info("created transaction from : " + transaction.getId());
+        log.info("created transaction from : " + transaction.getSender().getName() + " "
+                + transaction.getSender().getLastname());
 
         return new ResponseEntity<>(transaction.getConfirmationCode(), HttpStatus.OK);
     }
 
     @PostMapping("/receive")
-    public String receiveMoney(@RequestBody User user) {
-        transactionService.commitTransaction(user);
+    public ResponseEntity<?> receiveMoney(@RequestBody User user) {
+        try {
+            transactionService.commitTransaction(user);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
-        return "ok";
+        log.info("Transaction successfully completed");
+        return new ResponseEntity<>("Transaction completed", HttpStatus.OK);
     }
 }

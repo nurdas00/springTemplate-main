@@ -2,13 +2,11 @@ package task.entity;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -26,17 +24,15 @@ public class User implements UserDetails{
     private String password;
     private String confirmationCode;
 
+    @Transient
+    private Set<SimpleGrantedAuthority> authorities;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id")
     private Balance balance;
 
     public String getPassword(){
         return "{noop}" + password;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     @Override

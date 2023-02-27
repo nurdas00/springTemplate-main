@@ -1,10 +1,10 @@
 package task.entity;
 
 
-import task.enums.Currency;
-import task.enums.TransactionStatus;
 import lombok.Getter;
 import lombok.Setter;
+import task.enums.Currency;
+import task.enums.TransactionStatus;
 
 import javax.persistence.*;
 
