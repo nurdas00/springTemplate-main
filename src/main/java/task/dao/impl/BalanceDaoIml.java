@@ -2,7 +2,7 @@ package task.dao.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import task.Exception.TransactionException;
+import task.exception.TransactionException;
 import task.dao.BalanceDao;
 import task.enums.Currency;
 

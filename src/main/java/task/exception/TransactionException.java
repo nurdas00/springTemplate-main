@@ -1,4 +1,4 @@
-package task.Exception;
+package task.exception;
 
 public class TransactionException extends RuntimeException{
     private final String msg;

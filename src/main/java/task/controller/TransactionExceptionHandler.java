@@ -3,7 +3,7 @@ package task.controller;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
-import task.Exception.TransactionException;
+import task.exception.TransactionException;
 
 import javax.servlet.http.HttpServletRequest;
 

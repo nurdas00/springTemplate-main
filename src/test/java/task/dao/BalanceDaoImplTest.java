@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import task.Exception.TransactionException;
+import task.exception.TransactionException;
 import task.enums.Currency;
 
 import javax.persistence.EntityManager;
