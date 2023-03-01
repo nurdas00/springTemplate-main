@@ -77,15 +77,14 @@ public class TransactionServiceImplTest {
     @Test
     public void shouldCommitTransaction() {
         User sender = new User();
-        sender.setId(1L);
-        sender.setName("tom");
-        sender.setLastname("reddle");
+        sender.setId(2L);
+        sender.setName("harry");
+        sender.setLastname("potter");
 
         User receiver = new User();
-        receiver.setId(2L);
-        receiver.setName("harry");
-        receiver.setLastname("potter");
-        receiver.setConfirmationCode("abc123");
+        receiver.setId(1L);
+        receiver.setName("tom");
+        receiver.setLastname("reddle");
 
         doNothing().when(balanceDao).subtractFromBalance(anyLong(), anyLong(), any());
         doNothing().when(balanceDao).addToBalance(anyLong(), anyLong(), any());
@@ -93,12 +92,14 @@ public class TransactionServiceImplTest {
         doReturn(new Transaction()).when(transactionRepository).save(any());
 
         Transaction transaction = new Transaction();
+        transaction.setId(1L);
         transaction.setAmount(100L);
         transaction.setSender(sender);
         transaction.setReceiver(receiver);
+        transaction.setConfirmationCode("abc123");
         doReturn(transaction).when(transactionRepository).findByConfirmationCode(anyString());
 
-        service.commitTransaction(receiver);
+        service.commitTransaction(transaction, 1L);
 
         assertEquals(transaction.getStatus(), TransactionStatus.COMPLETED);
     }

@@ -1,4 +1,3 @@
-/*
 package task.security;
 
 import lombok.RequiredArgsConstructor;
@@ -17,14 +16,14 @@ public class WebSecurityConfig {
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/login", "/index", "/actuator/**").permitAll()
+                .antMatchers("/login", "/actuator/**").permitAll()
                 .antMatchers("/**").authenticated()
                 .and()
                 .formLogin()
+                .defaultSuccessUrl("/index")
                 .and()
-                .logout().logoutSuccessUrl("/index");
+                .logout().logoutSuccessUrl("/login");
 
         return http.build();
     }
 }
-*/

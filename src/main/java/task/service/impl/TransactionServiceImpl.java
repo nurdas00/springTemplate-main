@@ -8,12 +8,16 @@ import task.dao.BalanceDao;
 import task.entity.Transaction;
 import task.entity.User;
 import task.enums.TransactionStatus;
-import task.repository.UserRepository;
 import task.repository.TransactionRepository;
+import task.repository.UserRepository;
 import task.service.TransactionService;
 
 import javax.transaction.Transactional;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -33,12 +37,15 @@ public class TransactionServiceImpl implements TransactionService {
         balanceDao.checkBalance(transaction.getSender().getId(), transaction.getAmount(), transaction.getCurrency());
 
         transactionRepository.save(transaction);
+
+        log.info("created transaction from : " + transaction.getSender().getName() + " "
+                + transaction.getSender().getLastname());
     }
 
     @Override
     @Transactional
-    public void commitTransaction(User user) {
-        Transaction transaction = getTransaction(user);
+    public void commitTransaction(Transaction transaction, Long id) {
+        checkTransaction(transaction, id);
 
         log.info("committing transaction with id: " + transaction.getId());
 
@@ -47,14 +54,37 @@ public class TransactionServiceImpl implements TransactionService {
 
         transaction.setStatus(TransactionStatus.COMPLETED);
         transactionRepository.save(transaction);
+
+        log.info("Transaction successfully completed");
+    }
+
+    @Override
+    public List<Transaction> getUserAsReceiverTransactions(User user) {
+        List<Transaction> transactions = (List<Transaction>) transactionRepository.findAll();
+
+        return transactions.stream()
+                .filter(t -> Objects.equals(t.getReceiver().getName(), user.getName())
+                        && Objects.equals(t.getReceiver().getLastname(), user.getLastname()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Transaction getTransactionById(Long id) {
+        Optional<Transaction> transaction =transactionRepository.findById(id);
+        if(transaction.isPresent()) {
+            return transaction.get();
+        }
+        throw new TransactionException("no transaction with id:" + id);
     }
 
     private void setTransactionFields(Transaction transaction) {
         User receiver = transaction.getReceiver();
-        User sender = transaction.getSender();
 
-        receiver.setId(userRepository.findUserByNameAndLastname(receiver.getName(), receiver.getLastname()).getId());
-        sender.setId(userRepository.findUserByNameAndLastname(sender.getName(), sender.getLastname()).getId());
+        try {
+            receiver.setId(userRepository.findUserByNameAndLastname(receiver.getName(), receiver.getLastname()).getId());
+        } catch (Exception e) {
+            throw new TransactionException("couldn't find receiver");
+        }
 
         String code = UUID.randomUUID().toString().replace("-", "").substring(0, 5);
         transaction.setConfirmationCode(code);
@@ -62,25 +92,19 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setStatus(TransactionStatus.CREATED);
     }
 
-    private Transaction getTransaction(User user) {
-        String code = user.getConfirmationCode();
-        Transaction transaction;
-
-        try {
-            transaction = transactionRepository.findByConfirmationCode(code);
-        } catch (Exception e) {
+    private void checkTransaction(Transaction transaction, Long id) {
+        String code = transaction.getConfirmationCode();
+        Transaction transactionByConfirmationCode = transactionRepository.findByConfirmationCode(code);
+        if (transactionByConfirmationCode == null) {
             throw new TransactionException("Couldn't find confirmation code");
         }
 
-        if (!transaction.getReceiver().getName().equalsIgnoreCase(user.getName()) &&
-                !transaction.getReceiver().getLastname().equalsIgnoreCase(user.getLastname())) {
-            throw new TransactionException("This code doesn't belong to you");
+        if(!Objects.equals(transactionByConfirmationCode.getId(), id)){
+            throw new TransactionException("You picked wrong transaction");
         }
 
-        if (transaction.getStatus() == TransactionStatus.COMPLETED) {
+        if (transactionByConfirmationCode.getStatus() == TransactionStatus.COMPLETED) {
             throw new TransactionException("Transaction is already completed");
         }
-
-        return transaction;
     }
 }

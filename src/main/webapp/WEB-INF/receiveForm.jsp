@@ -20,37 +20,129 @@
     </div>
     <div class="row align-items-center" style="height: 100vh;">
         <div class="mx-auto col-10">
-            <form id="receiveForm" method="post">
+            <form th:href="@{/receive/{id}(id=${transaction.id})}" method="post">
                 <h1>Fill form</h1>
-                <div class="form-group">
-                    <label for="name">Name</label>
+                <div class="form-group" hidden="">
+                    <label for="id">Id</label>
                     <input
                             class="form-control confirmation-code"
-                            id="name"
-                            placeholder="Name..."
-                            th:value="${name}"
-                            disabled
+                            id="id"
+                            name="id"
+                            th:value="${transaction.id}"
+                            readonly
+                    />
+                </div>
+                <div class="form-group" hidden="">
+                    <label for="amount">Amount</label>
+                    <input
+                            class="form-control confirmation-code"
+                            id="amount"
+                            name="amount"
+                            th:value="${transaction.amount}"
+                            readonly
+                    />
+                </div>
+                <div class="form-group" hidden="">
+                    <label for="currency">Currency</label>
+                    <input
+                            class="form-control"
+                            id="currency"
+                            name="currency"
+                            th:value="${transaction.currency}"
+                            readonly
+                    />
+                </div>
+                <div class="form-group" hidden="">
+                    <label for="comment">Currency</label>
+                    <input
+                            class="form-control"
+                            id="comment"
+                            name="comment"
+                            th:value="${transaction.comment}"
+                            readonly
+                    />
+                </div>
+                <div class="form-group" hidden="">
+                    <label for="status">Status</label>
+                    <input
+                            class="form-control"
+                            id="status"
+                            name="status"
+                            th:value="${transaction.status}"
+                            readonly
+                    />
+                </div>
+                <div class="form-group" hidden="">
+                    <label for="receiverId">ReceiverId</label>
+                    <input
+                            class="form-control"
+                            id="receiverId"
+                            name="receiver.id"
+                            th:value="${transaction.receiver.id}"
+                            readonly
                     />
                 </div>
                 <div class="form-group">
-                    <label for="lastname">Lastname</label>
+                    <label for="receiverName">Receiver name</label>
                     <input
-                            class="form-control confirmation-code"
+                            class="form-control"
+                            id="receiverName"
+                            name="receiver.name"
+                            th:value="${transaction.receiver.name}"
+                            readonly
+                    />
+                </div>
+                <div class="form-group">
+                    <label for="receiverLastname">Receiver lastname</label>
+                    <input
+                            class="form-control"
+                            id="receiverLastname"
+                            name="receiver.lastname"
+                            th:value="${transaction.receiver.lastname}"
+                            readonly
+                    />
+                </div>
+                <div class="form-group" hidden="">
+                    <label for="senderId">SenderId</label>
+                    <input
+                            class="form-control"
+                            id="senderId"
+                            name="sender.id"
+                            th:value="${transaction.sender.id}"
+                            readonly
+                    />
+                </div>
+                <div class="form-group" hidden="">
+                    <label for="name">SenderName</label>
+                    <input
+                            class="form-control"
+                            id="name"
+                            name="sender.name"
+                            th:value="${transaction.sender.name}"
+                            readonly
+                    />
+                </div>
+                <div class="form-group" hidden="">
+                    <label for="lastname">SenderLastname</label>
+                    <input
+                            class="form-control"
                             id="lastname"
-                            placeholder="Lastname..."
-                            th:value="${lastname}"
-                            disabled
+                            name="sender.lastname"
+                            th:value="${transaction.sender.lastname}"
+                            readonly
                     />
                 </div>
                 <div class="form-group">
                     <label for="confirmation-code">Secret Code</label>
                     <input
-                            class="form-control confirmation-code"
+                            class="form-control"
+                            name="confirmationCode"
                             id="confirmation-code"
                             placeholder="Confirmation code..."
+                            required
                     />
                 </div>
-                <button type="submit" class="receiveButton btn btn-primary btn-customized mt-4" form="receiveForm">
+                <button type="submit" class="btn btn-primary">
                     Ok
                 </button>
             </form>
@@ -66,36 +158,5 @@
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
-
-<script>
-    function setData(id) {
-        const fields = ["name", "lastname", "confirmationCode"];
-        let user = {};
-        let i = 0;
-
-        $(id).find('input').each(function () {
-            user[fields[i]] = this.value;
-            i++;
-        })
-
-        return user;
-    }
-
-    $(document).on('click', '.receiveButton', function () {
-
-        const data = setData("#receiveForm");
-
-        console.log(data);
-        fetch("http://localhost:8080/receive", {
-            method: 'POST',
-            headers: {
-                'content-type': 'application/json; charset=utf-8'
-            },
-            body: JSON.stringify(data)
-        }).then(function() {
-            alert("Transaction successfully completed");
-        });
-    })
-</script>
 </body>
 </html>

@@ -37,4 +37,8 @@ public class Transaction {
     private String confirmationCode;
 
     private String comment;
+
+    public Boolean isCompleted() {
+        return status == TransactionStatus.COMPLETED;
+    }
 }
